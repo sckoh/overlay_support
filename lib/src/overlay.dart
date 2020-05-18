@@ -14,12 +14,14 @@ part 'overlay_entry.dart';
 
 part 'overlay_key.dart';
 
-/// to build a widget with animated value
-/// [progress] : the progress of overlay animation from 0 - 1
+/// Signature for the builder callback used by [_AnimatedOverlay].
 ///
 /// a simple use case is [TopSlideNotification] in [showOverlayNotification]
 ///
-typedef Widget AnimatedOverlayWidgetBuilder(BuildContext context, double progress);
+typedef Widget AnimatedOverlayWidgetBuilder(BuildContext context, Animation<double> showAnimation);
+
+/// Signature for the builder callback used by [_AnimatedOverlay].
+typedef Widget AnimatedOverlayRemovedWidgetBuilder(BuildContext context, Animation<double> animation);
 
 ///basic api to show overlay widget
 ///
@@ -51,7 +53,7 @@ typedef Widget AnimatedOverlayWidgetBuilder(BuildContext context, double progres
 ///
 OverlaySupportEntry showOverlay(
   AnimatedOverlayWidgetBuilder builder, {
-  Curve curve,
+    AnimatedOverlayRemovedWidgetBuilder removedBuilder,
   Duration duration,
   Key key,
 }) {
@@ -89,7 +91,7 @@ OverlaySupportEntry showOverlay(
       child: _AnimatedOverlay(
         key: stateKey,
         builder: builder,
-        curve: curve,
+        removedBuilder: removedBuilder,
         animationDuration: kNotificationSlideDuration,
         duration: duration,
       ),
@@ -153,7 +155,7 @@ class OverlaySupport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(() {
-      if (context.ancestorWidgetOfExactType(OverlaySupport) != null) {
+      if (context.findAncestorWidgetOfExactType<OverlaySupport>() != null) {
         throw FlutterError('There is already an OverlaySupport in the Widget tree.');
       }
       return true;
